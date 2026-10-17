@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>सरकारी योजना खोजक</title>
+<style>
+  :root { --green:#1b6b3a; --light:#eef7f1; --warn:#fff6e0; --text:#1c1c1c; --muted:#5a5a5a; --line:#d9d9d9; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: system-ui, -apple-system, "Noto Sans Devanagari", "Segoe UI", sans-serif; background:#f6f6f6; color:var(--text); line-height:1.5; }
+  header { background:var(--green); color:#fff; padding:18px 16px; }
+  header h1 { margin:0 0 4px; font-size:22px; }
+  header p { margin:0; font-size:14px; opacity:.92; }
+  main { max-width:560px; margin:0 auto; padding:14px 14px 40px; }
+  .demo { background:var(--warn); border:1px solid #f0d58a; border-radius:10px; padding:10px 12px; font-size:13px; margin-bottom:14px; }
+  fieldset { background:#fff; border:1px solid var(--line); border-radius:12px; padding:12px 14px 6px; margin:0 0 14px; }
+  legend { font-weight:700; padding:0 6px; color:var(--green); }
+  label { display:block; font-size:15px; margin:10px 0 4px; font-weight:600; }
+  input, select { width:100%; padding:12px; font-size:16px; border:1px solid #bbb; border-radius:8px; background:#fff; }
+  .hidden { display:none; }
+  button.main { width:100%; padding:14px; font-size:18px; font-weight:700; color:#fff; background:var(--green); border:0; border-radius:10px; margin-top:4px; }
+  .err { color:#b00020; font-size:14px; margin:8px 0 0; min-height:18px; }
+  h2 { font-size:18px; margin:22px 0 8px; }
+  .card { background:#fff; border:1px solid var(--line); border-left:6px solid var(--green); border-radius:10px; padding:12px 14px; margin-bottom:12px; }
+  .card.maybe { border-left-color:#e0a100; }
+  .card h3 { margin:0 0 4px; font-size:17px; }
+  .benefit { font-weight:600; margin:0 0 6px; }
+  .note { font-size:14px; color:var(--muted); margin:6px 0; }
+  .docs { font-size:14px; margin:6px 0 8px; padding-left:18px; }
+  .docs li { margin:2px 0; }
+  a.apply { display:inline-block; font-size:14px; color:var(--green); font-weight:700; text-decoration:none; border:1px solid var(--green); border-radius:8px; padding:6px 10px; }
+  .disclaimer { background:var(--light); border:1px solid #bfe0cb; border-radius:10px; padding:10px 12px; font-size:14px; margin-top:16px; }
+  .empty { background:#fff; border:1px dashed var(--line); border-radius:10px; padding:14px; font-size:15px; }
+  button.again { width:100%; padding:12px; font-size:16px; background:#fff; color:var(--green); border:2px solid var(--green); border-radius:10px; margin-top:14px; font-weight:700; }
+</style>
+</head>
+<body>
+<header>
+  <h1>सरकारी योजना खोजक</h1>
+  <p>5 सवालों के जवाब दीजिए, जानिए कौन-सी योजना आपके लिए हो सकती है</p>
+</header>
+<main>
+  <div class="demo"><b>डेमो (परीक्षण) संस्करण:</b> यह सिर्फ़ मार्गदर्शन है। योजना के नियम बदलते रहते हैं, इसलिए आवेदन से पहले आधिकारिक वेबसाइट या अपने CSC केंद्र पर पुष्टि ज़रूर करें।</div>
+
+  <form id="form" novalidate>
+    <fieldset>
+      <legend>मुख्य जानकारी</legend>
+
+      <label for="age">1. आपकी उम्र (साल)</label>
+      <input id="age" type="number" inputmode="numeric" min="0" max="120" placeholder="जैसे 35">
+
+      <label for="gender">2. आप</label>
+      <select id="gender">
+        <option value="">-- चुनिए --</option>
+        <option value="m">पुरुष</option>
+        <option value="f">महिला</option>
+      </select>
+
+      <div id="maritalBox" class="hidden">
+        <label for="marital">वैवाहिक स्थिति</label>
+        <select id="marital">
+          <option value="">-- चुनिए --</option>
+          <option value="married">विवाहित</option>
+          <option value="widow">विधवा / तलाकशुदा / परित्यक्ता</option>
+          <option value="single">अविवाहित</option>
+        </select>
+      </div>
+
+      <label for="work">3. आप क्या काम करते हैं</label>
+      <select id="work">
+        <option value="">-- चुनिए --</option>
+        <option value="farmer">किसान (खेती)</option>
+        <option value="labour">मज़दूर / दिहाड़ी काम</option>
+        <option value="student">विद्यार्थी</option>
+        <option value="business">छोटा व्यापार / दुकान</option>
+        <option value="home">गृहिणी</option>
+        <option value="other">नौकरी / अन्य</option>
+      </select>
+
+      <label for="income">4. परिवार की सालाना आमदनी</label>
+      <select id="income">
+        <option value="">-- चुनिए --</option>
+        <option value="u1">1 लाख रुपये से कम</option>
+        <option value="u25">1 लाख से 2.5 लाख</option>
+        <option value="u5">2.5 लाख से 5 लाख</option>
+        <option value="o5">5 लाख से ज़्यादा</option>
+      </select>
+
+      <label for="category">5. श्रेणी</label>
+      <select id="category">
+        <option value="">-- चुनिए --</option>
+        <option value="gen">सामान्य</option>
+        <option value="obc">OBC</option>
+        <option value="sc">SC</option>
+        <option value="st">ST</option>
+      </select>
+    </fieldset>
+
+    <fieldset>
+      <legend>थोड़ी और जानकारी</legend>
+
+      <label for="tax">परिवार में कोई इनकम टैक्स भरता है?</label>
+      <select id="tax"><option value="">-- चुनिए --</option><option value="n">नहीं</option><option value="y">हाँ</option></select>
+
+      <label for="bank">आपका बैंक खाता है?</label>
+      <select id="bank"><option value="">-- चुनिए --</option><option value="y">हाँ</option><option value="n">नहीं</option></select>
+
+      <label for="pucca">क्या आपके पास पक्का मकान है?</label>
+      <select id="pucca"><option value="">-- चुनिए --</option><option value="n">नहीं</option><option value="y">हाँ</option></select>
+
+      <label for="lpg">घर में गैस कनेक्शन है?</label>
+      <select id="lpg"><option value="">-- चुनिए --</option><option value="n">नहीं</option><option value="y">हाँ</option></select>
+
+      <label for="girl">10 साल से कम उम्र की बेटी है?</label>
+      <select id="girl"><option value="">-- चुनिए --</option><option value="n">नहीं</option><option value="y">हाँ</option></select>
+    </fieldset>
+
+    <button class="main" type="submit">योजनाएँ खोजें</button>
+    <div class="err" id="err"></div>
+  </form>
+
+  <section id="results" class="hidden"></section>
+</main>
+
+<script>
+/* ====== योजनाओं का डेटा ======
+   ज़रूरी: यहाँ के नियम डेमो के लिए हैं। हर योजना की आधिकारिक वेबसाइट खोलकर
+   उम्र, आय-सीमा और दस्तावेज़ मिलाइए, फिर इस सूची में सुधार कीजिए।
+   status: "yes" = शायद पात्र, "maybe" = जाँच करें, "no" = नहीं दिखाना */
+
+var INCOME_RANK = { u1: 1, u25: 2, u5: 3, o5: 4 };
+
+var SCHEMES = [
+  {
+    name: "पीएम-किसान सम्मान निधि",
+    benefit: "किसान परिवार को सालाना आर्थिक सहायता (किस्तों में)",
+    docs: ["आधार कार्ड", "बैंक पासबुक", "ज़मीन के कागज़ (खसरा / बी-1)", "मोबाइल नंबर"],
+    link: "https://pmkisan.gov.in",
+    check: function (p) {
+      if (p.work !== "farmer") return { status: "no" };
+      if (p.tax === "y") return { status: "no" };
+      return { status: "yes", note: "खेती की ज़मीन परिवार के नाम पर होनी चाहिए।" };
+    }
+  },
+  {
+    name: "आयुष्मान भारत (PM-JAY)",
+    benefit: "सूचीबद्ध अस्पतालों में मुफ़्त इलाज का स्वास्थ्य बीमा",
+    docs: ["आधार कार्ड", "राशन कार्ड", "मोबाइल नंबर"],
+    link: "https://pmjay.gov.in",
+    check: function (p) {
+      if (p.age >= 70) return { status: "yes", note: "70 साल या उससे ऊपर के बुज़ुर्गों के लिए अलग प्रावधान है। पोर्टल पर पुष्टि करें।" };
+      if (INCOME_RANK[p.income] <= 2 || p.work === "labour") {
+        return { status: "maybe", note: "पात्रता सरकारी सूची पर आधारित है। अपने CSC केंद्र पर नाम चेक कराएँ।" };
+      }
+      return { status: "no" };
+    }
+  },
+  {
+    name: "लाड़ली बहना योजना (मध्य प्रदेश)",
+    benefit: "पात्र महिलाओं को हर महीने सीधे बैंक खाते में सहायता राशि",
+    docs: ["समग्र आईडी", "आधार कार्ड", "बैंक खाता (आधार से जुड़ा)", "मोबाइल नंबर"],
+    link: "https://cmladlibahna.mp.gov.in",
+    check: function (p) {
+      if (p.gender !== "f") return { status: "no" };
+      if (p.age < 21 || p.age > 60) return { status: "no" };
+      if (p.marital === "single") return { status: "no" };
+      if (p.tax === "y" || INCOME_RANK[p.income] > 2) return { status: "no" };
+      return { status: "yes", note: "सरकारी कर्मचारी के परिवार को लाभ नहीं मिलता। नियम और राशि आधिकारिक साइट पर देखें।" };
+    }
+  },
+  {
+    name: "प्रधानमंत्री आवास योजना",
+    benefit: "पक्का मकान बनाने के लिए आर्थिक सहायता",
+    docs: ["आधार कार्ड", "बैंक पासबुक", "राशन कार्ड", "ज़मीन / निवास का प्रमाण"],
+    link: "https://pmayg.nic.in",
+    check: function (p) {
+      if (p.pucca !== "n") return { status: "no" };
+      if (INCOME_RANK[p.income] <= 3) {
+        return { status: "maybe", note: "ग्रामीण क्षेत्र में पात्रता सर्वे सूची पर आधारित है। ग्राम पंचायत में अपना नाम पूछें।" };
+      }
+      return { status: "no" };
+    }
+  },
+  {
+    name: "उज्ज्वला योजना",
+    benefit: "गरीब परिवार की महिला को गैस कनेक्शन",
+    docs: ["आधार कार्ड", "राशन कार्ड / BPL प्रमाण", "बैंक खाता", "पासपोर्ट साइज़ फोटो"],
+    link: "https://www.pmuy.gov.in",
+    check: function (p) {
+      if (p.gender !== "f" || p.age < 18 || p.lpg !== "n") return { status: "no" };
+      if (INCOME_RANK[p.income] === 1) return { status: "yes", note: "परिवार में पहले से गैस कनेक्शन नहीं होना चाहिए।" };
+      if (INCOME_RANK[p.income] === 2) return { status: "maybe", note: "कुछ विशेष श्रेणियों के परिवारों को ही लाभ मिलता है। गैस एजेंसी से पूछें।" };
+      return { status: "no" };
+    }
+  },
+  {
+    name: "सुकन्या समृद्धि योजना",
+    benefit: "बेटी की पढ़ाई और शादी के लिए बचत खाता, ऊँचा ब्याज",
+    docs: ["बेटी का जन्म प्रमाणपत्र", "माता-पिता का आधार कार्ड", "पता प्रमाण", "फोटो"],
+    link: "https://www.indiapost.gov.in",
+    check: function (p) {
+      if (p.girl === "y") return { status: "yes", note: "बेटी 10 साल से कम उम्र की होनी चाहिए। खाता डाकघर या बैंक में खुलता है।" };
+      return { status: "no" };
+    }
+  },
+  {
+    name: "अटल पेंशन योजना",
+    benefit: "60 साल की उम्र के बाद हर महीने पक्की पेंशन",
+    docs: ["आधार कार्ड", "बैंक खाता", "मोबाइल नंबर"],
+    link: "https://www.jansuraksha.gov.in",
+    check: function (p) {
+      if (p.age < 18 || p.age > 40) return { status: "no" };
+      if (p.bank !== "y" || p.tax === "y") return { status: "no" };
+      return { status: "yes", note: "अपने बैंक में जाकर या नेट-बैंकिंग से खुलवा सकते हैं।" };
+    }
+  },
+  {
+    name: "प्रधानमंत्री मुद्रा लोन",
+    benefit: "छोटे व्यापार के लिए बैंक से बिना गारंटी लोन",
+    docs: ["आधार कार्ड", "पैन कार्ड", "व्यापार का प्रमाण / योजना", "बैंक स्टेटमेंट"],
+    link: "https://www.mudra.org.in",
+    check: function (p) {
+      if (p.work === "business" && p.age >= 18) return { status: "yes", note: "लोन की मंज़ूरी बैंक की शर्तों पर निर्भर करती है।" };
+      return { status: "no" };
+    }
+  },
+  {
+    name: "छात्रवृत्ति (मध्य प्रदेश)",
+    benefit: "पढ़ाई के लिए सरकारी स्कॉलरशिप",
+    docs: ["आधार कार्ड", "जाति प्रमाणपत्र", "आय प्रमाणपत्र", "पिछली कक्षा की मार्कशीट", "बैंक पासबुक"],
+    link: "https://scholarshipportal.mp.nic.in",
+    check: function (p) {
+      if (p.work !== "student") return { status: "no" };
+      if (p.category !== "gen" && INCOME_RANK[p.income] <= 2) {
+        return { status: "yes", note: "कक्षा और कोर्स के हिसाब से अलग-अलग छात्रवृत्तियाँ हैं। पोर्टल पर अपनी योजना चुनें।" };
+      }
+      return { status: "maybe", note: "आय-सीमा और श्रेणी की शर्तें योजना के अनुसार बदलती हैं। पोर्टल पर देखें।" };
+    }
+  },
+  {
+    name: "संबल योजना (मध्य प्रदेश)",
+    benefit: "असंगठित मज़दूरों और उनके परिवार को दुर्घटना / मृत्यु पर आर्थिक सहायता",
+    docs: ["समग्र आईडी", "आधार कार्ड", "बैंक खाता", "मोबाइल नंबर"],
+    link: "https://sambal.mp.gov.in",
+    check: function (p) {
+      if (p.work === "labour" && p.age >= 18 && p.age <= 60) {
+        return { status: "yes", note: "संबल पोर्टल पर पंजीकरण होना ज़रूरी है। पात्रता की शर्तें साइट पर देखें।" };
+      }
+      return { status: "no" };
+    }
+  }
+];
+
+function $(id) { return document.getElementById(id); }
+
+/* महिला चुनने पर वैवाहिक स्थिति का सवाल दिखाओ */
+$("gender").addEventListener("change", function () {
+  $("maritalBox").classList.toggle("hidden", this.value !== "f");
+});
+
+function readForm() {
+  return {
+    age: parseInt($("age").value, 10),
+    gender: $("gender").value,
+    marital: $("marital").value,
+    work: $("work").value,
+    income: $("income").value,
+    category: $("category").value,
+    tax: $("tax").value,
+    bank: $("bank").value,
+    pucca: $("pucca").value,
+    lpg: $("lpg").value,
+    girl: $("girl").value
+  };
+}
+
+function validate(p) {
+  if (isNaN(p.age) || p.age < 0 || p.age > 120) return "कृपया सही उम्र लिखिए।";
+  if (!p.gender) return "कृपया बताइए कि आप पुरुष हैं या महिला।";
+  if (p.gender === "f" && !p.marital) return "कृपया वैवाहिक स्थिति चुनिए।";
+  if (!p.work) return "कृपया अपना काम चुनिए।";
+  if (!p.income) return "कृपया परिवार की आमदनी चुनिए।";
+  if (!p.category) return "कृपया श्रेणी चुनिए।";
+  if (!p.tax || !p.bank || !p.pucca || !p.lpg || !p.girl) return "कृपया 'थोड़ी और जानकारी' के सभी सवालों का जवाब दीजिए।";
+  return "";
+}
+
+function esc(s) {
+  var d = document.createElement("div");
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function cardHtml(s, r, kind) {
+  var docs = s.docs.map(function (d) { return "<li>" + esc(d) + "</li>"; }).join("");
+  return '<div class="card ' + kind + '">' +
+    "<h3>" + esc(s.name) + "</h3>" +
+    '<p class="benefit">' + esc(s.benefit) + "</p>" +
+    (r.note ? '<p class="note">' + esc(r.note) + "</p>" : "") +
+    "<div class=\"note\"><b>ज़रूरी दस्तावेज़:</b></div>" +
+    '<ul class="docs">' + docs + "</ul>" +
+    '<a class="apply" href="' + s.link + '" target="_blank" rel="noopener">आधिकारिक वेबसाइट खोलें</a>' +
+    "</div>";
+}
+
+$("form").addEventListener("submit", function (e) {
+  e.preventDefault();
+  var p = readForm();
+  var msg = validate(p);
+  $("err").textContent = msg;
+  if (msg) return;
+
+  var yes = [], maybe = [];
+  SCHEMES.forEach(function (s) {
+    var r = s.check(p);
+    if (r.status === "yes") yes.push(cardHtml(s, r, "yes"));
+    else if (r.status === "maybe") maybe.push(cardHtml(s, r, "maybe"));
+  });
+
+  var html = "";
+  if (yes.length) html += "<h2>शायद आप इनके पात्र हैं (" + yes.length + ")</h2>" + yes.join("");
+  if (maybe.length) html += "<h2>इनकी जाँच कराइए (" + maybe.length + ")</h2>" + maybe.join("");
+  if (!yes.length && !maybe.length) {
+    html += '<div class="empty">आपकी दी हुई जानकारी के हिसाब से अभी कोई योजना नहीं मिली। अपने नज़दीकी CSC केंद्र या ग्राम पंचायत में पूछिए, वहाँ और योजनाओं की जानकारी मिल सकती है।</div>';
+  }
+  html += '<div class="disclaimer"><b>ध्यान दें:</b> यह अंतिम फ़ैसला नहीं है, सिर्फ़ अंदाज़ा है। आवेदन से पहले आधिकारिक वेबसाइट या अपने CSC केंद्र से पुष्टि ज़रूर करें।</div>';
+  html += '<button class="again" id="again" type="button">दोबारा खोजें</button>';
+
+  var box = $("results");
+  box.innerHTML = html;
+  box.classList.remove("hidden");
+  box.scrollIntoView({ behavior: "smooth" });
+
+  $("again").addEventListener("click", function () {
+    box.classList.add("hidden");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+});
+</script>
+</body>
+</html>
